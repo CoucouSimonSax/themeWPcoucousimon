@@ -133,7 +133,45 @@
 				{
 					"slug": "space-mono",
 					"name": "Space Mono",
-					"fontFamily": "\"Space Mono\", ui-monospace, \"SFMono-Regular\", monospace"
+					"fontFamily": "\"Space Mono\", ui-monospace, \"SFMono-Regular\", monospace",
+					"fontFace": [
+						{
+							"fontFamily": "Space Mono",
+							"fontWeight": "400",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/SpaceMono-Regular.woff2"
+							]
+						},
+						{
+							"fontFamily": "Space Mono",
+							"fontWeight": "400",
+							"fontStyle": "italic",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/SpaceMono-Italic.woff2"
+							]
+						},
+						{
+							"fontFamily": "Space Mono",
+							"fontWeight": "700",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/SpaceMono-Bold.woff2"
+							]
+						},
+						{
+							"fontFamily": "Space Mono",
+							"fontWeight": "700",
+							"fontStyle": "italic",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/SpaceMono-BoldItalic.woff2"
+							]
+						}
+					]
 				}
 			],
 			"fontSizes": [

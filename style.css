@@ -7,13 +7,8 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.1.0
+Version: 0.1.1
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
 */
-
-/* Space Mono — unique voix de texte du design system, livrée par Google
-   Fonts comme le prévoit tokens/fonts.css. Gobold, elle, est embarquée
-   dans le thème et déclarée dans theme.json. */
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
