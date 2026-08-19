@@ -1,0 +1,359 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"settings": {
+		"appearanceTools": true,
+		"useRootPaddingAwareAlignments": true,
+		"layout": {
+			"contentSize": "860px",
+			"wideSize": "1120px"
+		},
+		"color": {
+			"defaultPalette": false,
+			"defaultGradients": false,
+			"defaultDuotone": false,
+			"palette": [
+				{
+					"slug": "blue-500",
+					"name": "Bleu coucou",
+					"color": "#00cccc"
+				},
+				{
+					"slug": "blue-300",
+					"name": "Bleu clair",
+					"color": "#45dede"
+				},
+				{
+					"slug": "blue-200",
+					"name": "Bleu très clair",
+					"color": "#99eded"
+				},
+				{
+					"slug": "blue-700",
+					"name": "Bleu foncé",
+					"color": "#009aa3"
+				},
+				{
+					"slug": "blue-900",
+					"name": "Bleu profond",
+					"color": "#04565d"
+				},
+				{
+					"slug": "white",
+					"name": "Blanc",
+					"color": "#ffffff"
+				},
+				{
+					"slug": "gray",
+					"name": "Gris",
+					"color": "#6f7d7d"
+				},
+				{
+					"slug": "gray-700",
+					"name": "Texte",
+					"color": "#404949"
+				},
+				{
+					"slug": "ink",
+					"name": "Encre",
+					"color": "#0d1416"
+				},
+				{
+					"slug": "black",
+					"name": "Noir",
+					"color": "#000000"
+				}
+			]
+		},
+		"typography": {
+			"defaultFontSizes": false,
+			"fluid": false,
+			"fontFamilies": [
+				{
+					"slug": "gobold",
+					"name": "Gobold",
+					"fontFamily": "\"Gobold\", \"Bebas Neue\", \"Oswald\", system-ui, sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "300",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-Thin.woff2"
+							]
+						},
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "300",
+							"fontStyle": "italic",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-ThinItalic.woff2"
+							]
+						},
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "400",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-Regular.woff2"
+							]
+						},
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "400",
+							"fontStyle": "italic",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-RegularItalic.woff2"
+							]
+						},
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "700",
+							"fontStyle": "normal",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-Bold.woff2"
+							]
+						},
+						{
+							"fontFamily": "Gobold",
+							"fontWeight": "700",
+							"fontStyle": "italic",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/Gobold-BoldItalic.woff2"
+							]
+						}
+					]
+				},
+				{
+					"slug": "space-mono",
+					"name": "Space Mono",
+					"fontFamily": "\"Space Mono\", ui-monospace, \"SFMono-Regular\", monospace"
+				}
+			],
+			"fontSizes": [
+				{
+					"slug": "xxs",
+					"name": "Micro",
+					"size": "0.6875rem"
+				},
+				{
+					"slug": "xs",
+					"name": "Très petit",
+					"size": "0.75rem"
+				},
+				{
+					"slug": "sm",
+					"name": "Petit",
+					"size": "0.875rem"
+				},
+				{
+					"slug": "base",
+					"name": "Courant",
+					"size": "1rem"
+				},
+				{
+					"slug": "md",
+					"name": "Moyen",
+					"size": "1.125rem"
+				},
+				{
+					"slug": "lg",
+					"name": "Grand",
+					"size": "1.375rem"
+				},
+				{
+					"slug": "xl",
+					"name": "Très grand",
+					"size": "1.75rem"
+				},
+				{
+					"slug": "xxl",
+					"name": "Section",
+					"size": "2.25rem"
+				},
+				{
+					"slug": "xxxl",
+					"name": "Titre",
+					"size": "3rem"
+				},
+				{
+					"slug": "display",
+					"name": "Display",
+					"size": "4rem"
+				},
+				{
+					"slug": "display-lg",
+					"name": "Display large",
+					"size": "5.5rem"
+				},
+				{
+					"slug": "display-xl",
+					"name": "Affiche",
+					"size": "7.5rem"
+				}
+			]
+		},
+		"spacing": {
+			"defaultSpacingSizes": false,
+			"units": [
+				"px",
+				"rem",
+				"em",
+				"%",
+				"vh",
+				"vw"
+			],
+			"spacingSizes": [
+				{
+					"slug": "xxs",
+					"name": "4",
+					"size": "0.25rem"
+				},
+				{
+					"slug": "xs",
+					"name": "8",
+					"size": "0.5rem"
+				},
+				{
+					"slug": "sm",
+					"name": "12",
+					"size": "0.75rem"
+				},
+				{
+					"slug": "md",
+					"name": "16",
+					"size": "1rem"
+				},
+				{
+					"slug": "lg",
+					"name": "24",
+					"size": "1.5rem"
+				},
+				{
+					"slug": "xl",
+					"name": "32",
+					"size": "2rem"
+				},
+				{
+					"slug": "xxl",
+					"name": "40",
+					"size": "2.5rem"
+				},
+				{
+					"slug": "xxxl",
+					"name": "48",
+					"size": "3rem"
+				},
+				{
+					"slug": "huge",
+					"name": "64",
+					"size": "4rem"
+				},
+				{
+					"slug": "giant",
+					"name": "80",
+					"size": "5rem"
+				},
+				{
+					"slug": "mega",
+					"name": "96",
+					"size": "6rem"
+				},
+				{
+					"slug": "ultra",
+					"name": "128",
+					"size": "8rem"
+				}
+			]
+		},
+		"border": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "var:preset|color|white",
+			"text": "var:preset|color|gray-700"
+		},
+		"typography": {
+			"fontFamily": "var:preset|font-family|space-mono",
+			"fontSize": "var:preset|font-size|base",
+			"lineHeight": "1.55"
+		},
+		"spacing": {
+			"blockGap": "var:preset|spacing|lg",
+			"padding": {
+				"top": "0",
+				"bottom": "var:preset|spacing|mega",
+				"left": "var:preset|spacing|lg",
+				"right": "var:preset|spacing|lg"
+			}
+		},
+		"elements": {
+			"link": {
+				"color": {
+					"text": "var:preset|color|blue-700"
+				},
+				"typography": {
+					"textDecoration": "underline"
+				},
+				":hover": {
+					"color": {
+						"text": "var:preset|color|blue-900"
+					}
+				}
+			},
+			"heading": {
+				"color": {
+					"text": "var:preset|color|ink"
+				},
+				"typography": {
+					"fontFamily": "var:preset|font-family|gobold",
+					"fontWeight": "400",
+					"lineHeight": "1.08",
+					"letterSpacing": "0.04em",
+					"textTransform": "uppercase"
+				}
+			},
+			"h1": {
+				"typography": {
+					"fontSize": "var:preset|font-size|display"
+				}
+			},
+			"h2": {
+				"typography": {
+					"fontSize": "var:preset|font-size|xxxl"
+				}
+			},
+			"h3": {
+				"typography": {
+					"fontSize": "var:preset|font-size|xxl"
+				}
+			},
+			"h4": {
+				"typography": {
+					"fontSize": "var:preset|font-size|xl"
+				}
+			},
+			"h5": {
+				"typography": {
+					"fontSize": "var:preset|font-size|lg"
+				}
+			},
+			"h6": {
+				"typography": {
+					"fontSize": "var:preset|font-size|md"
+				}
+			}
+		}
+	}
+}
