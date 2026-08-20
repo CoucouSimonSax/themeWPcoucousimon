@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.7.1
+Version: 0.7.2
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -251,7 +251,13 @@ Text Domain: coucousimon
 
 .devis__cards {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+
+	/*
+	 * minmax(0, 1fr) et non 1fr : sinon chaque colonne refuse de descendre
+	 * sous la largeur minimale de son contenu — que le rapport de forme rend
+	 * ici très large — et la ligne déborde par la droite sur petit écran.
+	 */
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: var(--wp--preset--spacing--md);
 }
 
@@ -568,17 +574,35 @@ Text Domain: coucousimon
 
 @media (max-width: 600px) {
 
-	/* Les trois vignettes restent sur une ligne : elles retrecissent, pas la ligne. */
+	/* Les trois vignettes restent sur une ligne : elles rétrécissent, pas la ligne. */
 	.devis__cards {
 		gap: var(--wp--preset--spacing--xs);
 	}
 
+	/*
+	 * À cette largeur, une vignette deux fois plus large que haute ne laisse
+	 * plus assez de hauteur au motif. On abandonne le rapport de forme : la
+	 * hauteur suit le contenu.
+	 */
 	.devis-card {
-		padding: var(--wp--preset--spacing--sm);
+		aspect-ratio: auto;
+		gap: var(--wp--preset--spacing--xs);
+		padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--xs);
 	}
 
-	.devis-card__name {
+	.devis-card__figure {
+		max-width: var(--wp--preset--spacing--xxl);
+	}
+
+	/*
+	 * Le nom descend sous le motif et reste affiché : au doigt il n'y a pas
+	 * de survol, donc le révéler n'aurait aucun sens. Sélecteur à deux classes
+	 * pour passer devant la règle de survol.
+	 */
+	.devis-card .devis-card__name {
+		position: static;
 		font-size: var(--wp--preset--font-size--xxs);
+		opacity: 1;
 	}
 
 	.devis__total-note {
