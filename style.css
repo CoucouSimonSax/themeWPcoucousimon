@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.5.0
+Version: 0.6.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -21,30 +21,25 @@ Text Domain: coucousimon
    border-radius s'appuient donc sur --wp--custom--radius, qui vaut 0.
    ========================================================================== */
 
-/* --- Fond animé ------------------------------------------------------------
-   Le motif de triangles du design system, derrière toute la page. Le composant
-   se met « position: relative » en style en ligne : impossible de le fixer
-   depuis ici, d'où l'enveloppe qui porte la position.
+/* --- Fond ------------------------------------------------------------------
+   Le motif de triangles du design system, derrière toute la page.
    -------------------------------------------------------------------------- */
 
 .devis-fond {
 	position: fixed;
 	inset: 0;
 	z-index: -1;
-	overflow: hidden;
 	pointer-events: none;
+	background-image: url("assets/motifs/triangles-light.svg");
+	background-position: center;
+	background-size: cover;
 
 	/*
 	 * La mise en page « contenue » de WordPress plafonne la largeur de chaque
-	 * enfant direct à la taille du contenu. Sur un élément fixé, cela reduit
+	 * enfant direct à la taille du contenu. Sur un élément fixé, cela réduit
 	 * le fond à la colonne de texte au lieu de la fenêtre entière.
 	 */
 	max-width: none;
-}
-
-.devis-fond cs-triangles-live {
-	width: 100%;
-	height: 100%;
 }
 
 .devis__step {
@@ -207,33 +202,14 @@ Text Domain: coucousimon
 	background: var(--wp--custom--color--surface-sunken);
 }
 
-/* Le voile couvre la toile tant que le visiteur n'a pas demandé la carte. */
-.devis__carte-voile {
-	position: absolute;
-	inset: 0;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: var(--wp--preset--spacing--md);
-	padding: var(--wp--preset--spacing--lg);
-	text-align: center;
-	background: var(--wp--custom--color--surface-sunken);
-}
-
-.devis__carte-voile[hidden] {
-	display: none;
-}
-
-.devis__carte-texte {
-	max-width: 42ch;
-	font-size: var(--wp--preset--font-size--sm);
+.devis__carte-mention {
+	margin-top: var(--wp--preset--spacing--xs);
+	font-size: var(--wp--preset--font-size--xs);
 	color: var(--wp--custom--color--text-muted);
 }
 
-.devis__carte-bouton {
-	width: auto;
-	margin-top: 0;
+.devis__carte-mention[hidden] {
+	display: none;
 }
 
 /* Repères dessinés en CSS : aucune image à charger. */

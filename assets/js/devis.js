@@ -43,8 +43,7 @@
 
 	var carteEl = root.querySelector( '[data-devis-carte]' );
 	var carteToile = root.querySelector( '[data-devis-carte-toile]' );
-	var carteVoile = root.querySelector( '[data-devis-carte-voile]' );
-	var carteBouton = root.querySelector( '[data-devis-carte-afficher]' );
+	var carteMention = root.querySelector( '[data-devis-carte-mention]' );
 
 	var chercheTimer = null;
 	var enCours = false;
@@ -52,25 +51,6 @@
 	var carte = null;
 	var trace = null;
 	var pointArrivee = null;
-
-	/** Mémoire du consentement, pour ne pas le redemander à chaque changement de ville. */
-	var CLE_CONSENTEMENT = 'coucousimon-carte';
-
-	/** Le visiteur a-t-il déjà accepté d'afficher la carte pendant cette visite ? */
-	function carteAcceptee() {
-		try {
-			return 'oui' === window.sessionStorage.getItem( CLE_CONSENTEMENT );
-		} catch ( e ) {
-			return false;
-		}
-	}
-
-	/** Retient le consentement pour la durée de la visite. */
-	function retientConsentement() {
-		try {
-			window.sessionStorage.setItem( CLE_CONSENTEMENT, 'oui' );
-		} catch ( e ) {}
-	}
 
 	/**
 	 * Charge Leaflet depuis le thème, une seule fois, au moment où on en a besoin.
@@ -107,7 +87,7 @@
 		} );
 	}
 
-	/** Dessine le trajet. Suppose le consentement déjà donné. */
+	/** Dessine le trajet depuis La Ciotat. */
 	function dessineCarte() {
 		if ( ! trace || ! trace.length ) {
 			return;
@@ -119,8 +99,6 @@
 				var origine = window.coucousimonDevis.origine;
 				var bleu = getComputedStyle( document.documentElement )
 					.getPropertyValue( '--wp--preset--color--blue-500' ).trim() || '#00cccc';
-
-				carteVoile.hidden = true;
 
 				if ( ! carte ) {
 					carte = L.map( carteToile, { scrollWheelZoom: false } );
@@ -163,6 +141,7 @@
 		trace = null;
 		pointArrivee = null;
 		carteEl.hidden = true;
+		carteMention.hidden = true;
 	}
 
 	/**
@@ -288,10 +267,8 @@
 				trace = trajet.trace;
 				pointArrivee = [ lieu.lat, lieu.lon ];
 				carteEl.hidden = false;
-
-				if ( carteAcceptee() ) {
-					dessineCarte();
-				}
+				carteMention.hidden = false;
+				dessineCarte();
 
 				recalculate();
 			} )
@@ -488,11 +465,6 @@
 
 	backBtn.addEventListener( 'click', function () {
 		showStep( '1' );
-	} );
-
-	carteBouton.addEventListener( 'click', function () {
-		retientConsentement();
-		dessineCarte();
 	} );
 
 	submitBtn.addEventListener( 'click', envoie );

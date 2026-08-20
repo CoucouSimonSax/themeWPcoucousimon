@@ -33,13 +33,12 @@ $coucousimon_opacites = array( '1', '.62', '.38' );
 ?>
 <?php
 /*
- * Le motif du design system, en fond de page. Le composant se pose des styles
- * en ligne sur lui-même, d'où l'enveloppe : c'est elle qui est fixée à l'écran.
+ * Le motif du design system, en fond de page. Version fixe : le design system
+ * fournit aussi une variante animée (assets/motifs/triangles-live.js), à
+ * reprendre à la source le jour où on la voudra.
  */
 ?>
-<div class="devis-fond" aria-hidden="true">
-	<cs-triangles-live variant="light" speed="0.6"></cs-triangles-live>
-</div>
+<div class="devis-fond" aria-hidden="true"></div>
 
 <div class="devis" data-devis>
 
@@ -100,20 +99,16 @@ $coucousimon_opacites = array( '1', '.62', '.38' );
 
 			<?php
 			/*
-			 * La carte reste éteinte tant que le visiteur ne la demande pas :
-			 * ses tuiles viennent d'OpenStreetMap, donc l'afficher revient à
-			 * transmettre son adresse IP à un tiers. On le dit, et on attend.
+			 * La carte apparaît dès qu'un trajet est calculé, sans rien demander
+			 * — choix de Simon, comme dans la version d'origine. Ses tuiles
+			 * viennent d'OpenStreetMap : le visiteur qui choisit un lieu y
+			 * transmet donc son adresse IP. La mention sous la carte le dit.
 			 */
 			?>
 			<div class="devis__carte" data-devis-carte hidden>
 				<div class="devis__carte-toile" data-devis-carte-toile></div>
-				<div class="devis__carte-voile" data-devis-carte-voile>
-					<p class="devis__carte-texte"><?php esc_html_e( 'La carte est fournie par OpenStreetMap. L’afficher transmet votre adresse IP à leurs serveurs.', 'coucousimon' ); ?></p>
-					<button type="button" class="devis__btn devis__btn--secondary devis__carte-bouton" data-devis-carte-afficher>
-						<?php esc_html_e( 'Afficher la carte', 'coucousimon' ); ?>
-					</button>
-				</div>
 			</div>
+			<p class="devis__carte-mention" data-devis-carte-mention hidden><?php esc_html_e( 'Fond de carte OpenStreetMap.', 'coucousimon' ); ?></p>
 		</div>
 
 		<div class="devis__section">
