@@ -50,11 +50,11 @@ add_action( 'init', 'coucousimon_pattern_category' );
 /**
  * Charge le script du devis, uniquement sur la page qui en a besoin.
  *
- * Le gabarit templates/page-devis.html s'applique automatiquement à la page
- * dont le permalien est /devis/ : c'est cette page-là qu'on cible ici.
+ * On repère la page au gabarit qu'elle a choisi, pas à son adresse : Simon
+ * doit pouvoir renommer la page sans que le devis cesse de fonctionner.
  */
 function coucousimon_enqueue_devis_script() {
-	if ( ! is_page( 'devis' ) ) {
+	if ( ! is_page() || 'devis' !== get_page_template_slug() ) {
 		return;
 	}
 

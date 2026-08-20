@@ -1,6 +1,15 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 3,
+	"customTemplates": [
+		{
+			"name": "devis",
+			"title": "Page de devis",
+			"postTypes": [
+				"page"
+			]
+		}
+	],
 	"settings": {
 		"appearanceTools": true,
 		"useRootPaddingAwareAlignments": true,
