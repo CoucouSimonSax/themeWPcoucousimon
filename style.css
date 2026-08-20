@@ -7,8 +7,430 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.1.1
+Version: 0.3.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
 */
+
+/* ==========================================================================
+   Page de devis
+   --------------------------------------------------------------------------
+   Toutes les valeurs viennent de theme.json (presets + settings.custom).
+   Le design system impose zéro arrondi et un contour net : les règles
+   border-radius s'appuient donc sur --wp--custom--radius, qui vaut 0.
+   ========================================================================== */
+
+.devis__step {
+	display: none;
+}
+
+.devis__step.is-active {
+	display: block;
+}
+
+.devis__intro {
+	margin-bottom: var(--wp--preset--spacing--xl);
+}
+
+.devis__title {
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--xxl);
+	font-weight: 400;
+	line-height: 1.08;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--ink);
+}
+
+.devis__subtitle {
+	margin-top: var(--wp--preset--spacing--xxs);
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__section {
+	margin-bottom: var(--wp--preset--spacing--xl);
+}
+
+.devis__fieldset {
+	margin-inline: 0;
+	padding: 0;
+	border: 0;
+}
+
+/* --- Libellés et champs -------------------------------------------------- */
+
+.devis__label {
+	display: block;
+	margin-bottom: var(--wp--preset--spacing--xs);
+	padding: 0;
+	font-size: var(--wp--preset--font-size--xxs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__input,
+.devis__textarea {
+	width: 100%;
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
+	font-family: var(--wp--preset--font-family--space-mono);
+	font-size: var(--wp--preset--font-size--base);
+	color: var(--wp--preset--color--ink);
+	background: var(--wp--preset--color--white);
+	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
+	border-radius: var(--wp--custom--radius);
+	transition: border-color var(--wp--custom--motion--fast) var(--wp--custom--motion--ease),
+		box-shadow var(--wp--custom--motion--fast) var(--wp--custom--motion--ease);
+}
+
+.devis__input:hover,
+.devis__textarea:hover {
+	border-color: var(--wp--custom--color--border-hover);
+}
+
+.devis__input:focus,
+.devis__textarea:focus {
+	outline: none;
+	border-color: var(--wp--preset--color--blue-500);
+	box-shadow: var(--wp--custom--ring);
+}
+
+.devis__textarea {
+	resize: vertical;
+}
+
+.devis__hint {
+	margin-top: var(--wp--preset--spacing--xs);
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__hint:empty {
+	display: none;
+}
+
+.devis__erreur {
+	margin-bottom: var(--wp--preset--spacing--md);
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--on-ink);
+	background: var(--wp--preset--color--ink);
+	border-left: var(--wp--custom--border--bold) solid var(--wp--preset--color--blue-500);
+}
+
+/* Champ piège anti-robot : hors de l'écran, jamais lu par un lecteur d'écran. */
+.devis__piege {
+	position: absolute;
+	left: -9999px;
+}
+
+/* --- Suggestions de lieu -------------------------------------------------- */
+
+.devis__suggestions {
+	max-height: 15rem;
+	overflow-y: auto;
+	background: var(--wp--preset--color--white);
+	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
+	border-top: 0;
+}
+
+.devis__suggestion {
+	display: block;
+	width: 100%;
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
+	font-family: inherit;
+	font-size: var(--wp--preset--font-size--sm);
+	text-align: left;
+	color: var(--wp--preset--color--ink);
+	background: transparent;
+	border: 0;
+	border-bottom: var(--wp--custom--border--thin) solid var(--wp--custom--color--border);
+	cursor: pointer;
+}
+
+.devis__suggestion:last-child {
+	border-bottom: 0;
+}
+
+.devis__suggestion:hover,
+.devis__suggestion:focus-visible {
+	outline: none;
+	color: var(--wp--custom--color--on-accent);
+	background: var(--wp--preset--color--blue-200);
+}
+
+/* --- Cartes de formule --------------------------------------------------- */
+
+.devis__cards {
+	display: grid;
+	gap: var(--wp--preset--spacing--md);
+}
+
+.devis-card {
+	display: grid;
+	grid-template-columns: var(--wp--preset--spacing--mega) 1fr;
+	gap: var(--wp--preset--spacing--lg);
+	align-items: start;
+	padding: var(--wp--preset--spacing--lg);
+	background: var(--wp--preset--color--white);
+	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
+	border-radius: var(--wp--custom--radius);
+	cursor: pointer;
+	transition: background var(--wp--custom--motion--fast) var(--wp--custom--motion--ease),
+		border-color var(--wp--custom--motion--fast) var(--wp--custom--motion--ease);
+}
+
+.devis-card:hover {
+	border-color: var(--wp--custom--color--border-hover);
+}
+
+.devis-card:has(.devis-card__input:focus-visible) {
+	box-shadow: var(--wp--custom--ring);
+}
+
+.devis-card:has(.devis-card__input:checked) {
+	background: var(--wp--preset--color--blue-500);
+	border-color: var(--wp--preset--color--ink);
+}
+
+/* Le bouton radio porte l'état ; on le sort du flux sans le retirer du clavier. */
+.devis-card__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	clip-path: inset(50%);
+}
+
+.devis-card__figure {
+	display: block;
+	color: var(--wp--preset--color--ink);
+}
+
+.devis-card__figure svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.devis-card__body {
+	display: block;
+}
+
+.devis-card__head {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: var(--wp--preset--spacing--sm);
+	margin-bottom: var(--wp--preset--spacing--xs);
+}
+
+.devis-card__name {
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--lg);
+	line-height: 1.08;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--ink);
+}
+
+.devis-card__price {
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--xl);
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: var(--wp--preset--color--blue-700);
+}
+
+.devis-card__desc {
+	display: block;
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--text-muted);
+}
+
+/* Sur l'aplat bleu coucou, le noir se lit mieux que le blanc. */
+.devis-card:has(.devis-card__input:checked) .devis-card__figure,
+.devis-card:has(.devis-card__input:checked) .devis-card__name,
+.devis-card:has(.devis-card__input:checked) .devis-card__price,
+.devis-card:has(.devis-card__input:checked) .devis-card__desc {
+	color: var(--wp--custom--color--on-accent);
+}
+
+/* --- Estimation ---------------------------------------------------------- */
+
+.devis__total {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--wp--preset--spacing--md);
+	padding: var(--wp--preset--spacing--lg) var(--wp--preset--spacing--xl);
+	background: var(--wp--preset--color--ink);
+	color: var(--wp--custom--color--on-ink);
+}
+
+.devis__total-main {
+	display: block;
+}
+
+.devis__total-label {
+	display: block;
+	font-size: var(--wp--preset--font-size--xxs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--blue-200);
+}
+
+.devis__total-amount {
+	display: block;
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--xxl);
+	line-height: 1.08;
+	letter-spacing: 0.04em;
+	color: var(--wp--preset--color--blue-500);
+}
+
+.devis__total-note {
+	display: block;
+	max-width: 18ch;
+	font-size: var(--wp--preset--font-size--xs);
+	line-height: 1.4;
+	text-align: right;
+	color: var(--wp--preset--color--blue-200);
+}
+
+.devis__total-detail {
+	margin-top: var(--wp--preset--spacing--xs);
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__note {
+	margin-top: var(--wp--preset--spacing--sm);
+	font-size: var(--wp--preset--font-size--sm);
+	font-style: italic;
+	color: var(--wp--custom--color--text-muted);
+}
+
+/* --- Boutons ------------------------------------------------------------- */
+
+.devis__btn {
+	display: block;
+	width: 100%;
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--xl);
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--md);
+	line-height: 1.4;
+	letter-spacing: 0.06em;
+	text-align: center;
+	text-transform: uppercase;
+	border: var(--wp--custom--border--base) solid transparent;
+	border-radius: var(--wp--custom--radius);
+	cursor: pointer;
+	transition: background var(--wp--custom--motion--fast) var(--wp--custom--motion--ease),
+		color var(--wp--custom--motion--fast) var(--wp--custom--motion--ease),
+		border-color var(--wp--custom--motion--fast) var(--wp--custom--motion--ease);
+}
+
+.devis__btn:focus-visible {
+	outline: none;
+	box-shadow: var(--wp--custom--ring);
+}
+
+.devis__btn[disabled] {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.devis__btn--primary {
+	background: var(--wp--preset--color--blue-500);
+	color: var(--wp--custom--color--on-accent);
+}
+
+.devis__btn--primary:not([disabled]):hover {
+	background: var(--wp--preset--color--blue-700);
+}
+
+.devis__btn--primary:not([disabled]):active {
+	background: var(--wp--preset--color--blue-900);
+	color: var(--wp--custom--color--on-ink);
+}
+
+.devis__btn--secondary {
+	margin-top: var(--wp--preset--spacing--sm);
+	background: transparent;
+	color: var(--wp--preset--color--ink);
+	border-color: var(--wp--preset--color--ink);
+}
+
+.devis__btn--secondary:hover {
+	background: var(--wp--preset--color--ink);
+	color: var(--wp--custom--color--on-ink);
+}
+
+/* --- Récapitulatif ------------------------------------------------------- */
+
+.devis__recap {
+	margin-bottom: var(--wp--preset--spacing--xl);
+	padding: var(--wp--preset--spacing--lg);
+	background: var(--wp--custom--color--surface-sunken);
+	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
+}
+
+.devis__recap-title {
+	margin-bottom: var(--wp--preset--spacing--sm);
+	font-size: var(--wp--preset--font-size--xxs);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__recap-line {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: var(--wp--preset--spacing--md);
+	padding: var(--wp--preset--spacing--xs) 0;
+	font-size: var(--wp--preset--font-size--sm);
+	border-bottom: var(--wp--custom--border--thin) solid var(--wp--custom--color--border);
+}
+
+.devis__recap-line:last-child {
+	font-weight: 700;
+	color: var(--wp--preset--color--blue-900);
+	border-bottom: 0;
+}
+
+/* --- Confirmation -------------------------------------------------------- */
+
+.devis__done {
+	padding: var(--wp--preset--spacing--mega) 0;
+	text-align: center;
+}
+
+/* --- Écrans étroits ------------------------------------------------------ */
+
+@media (max-width: 600px) {
+
+	.devis-card {
+		grid-template-columns: 1fr;
+	}
+
+	.devis-card__figure {
+		width: var(--wp--preset--spacing--xxl);
+	}
+
+	.devis__total-note {
+		max-width: none;
+		text-align: left;
+	}
+}

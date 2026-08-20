@@ -315,6 +315,28 @@
 			"radius": true,
 			"style": true,
 			"width": true
+		},
+		"custom": {
+			"color": {
+				"border": "color-mix(in srgb, var(--wp--preset--color--gray) 26%, var(--wp--preset--color--white))",
+				"borderHover": "color-mix(in srgb, var(--wp--preset--color--gray) 44%, var(--wp--preset--color--white))",
+				"surfaceSunken": "color-mix(in srgb, var(--wp--preset--color--gray) 7%, var(--wp--preset--color--white))",
+				"textMuted": "var(--wp--preset--color--gray)",
+				"onAccent": "var(--wp--preset--color--black)",
+				"onInk": "var(--wp--preset--color--white)"
+			},
+			"border": {
+				"thin": "1px",
+				"base": "2px",
+				"bold": "3px"
+			},
+			"radius": "0",
+			"ring": "0 0 0 3px color-mix(in srgb, var(--wp--preset--color--blue-500) 45%, transparent)",
+			"motion": {
+				"ease": "cubic-bezier(0.16, 0.84, 0.44, 1)",
+				"fast": "120ms",
+				"base": "180ms"
+			}
 		}
 	},
 	"styles": {
