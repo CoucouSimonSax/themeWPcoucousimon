@@ -69,11 +69,21 @@ function coucousimon_enqueue_devis_script() {
 		)
 	);
 
-	// L'adresse des routes du thème. C'est la seule adresse que le script appelle.
+	/*
+	 * Ce que le script a besoin de savoir. Leaflet n'est pas chargé ici : le
+	 * script ira le chercher lui-même, et seulement si le visiteur demande à
+	 * voir la carte. Inutile d'imposer 160 Ko à qui ne la regardera pas.
+	 */
 	wp_add_inline_script(
 		'coucousimon-devis',
 		'window.coucousimonDevis = ' . wp_json_encode(
-			array( 'racine' => esc_url_raw( rest_url( 'coucousimon/v1/' ) ) )
+			array(
+				'racine'      => esc_url_raw( rest_url( 'coucousimon/v1/' ) ),
+				'leafletJs'   => esc_url_raw( get_theme_file_uri( 'assets/vendor/leaflet/leaflet.js' ) ),
+				'leafletCss'  => esc_url_raw( get_theme_file_uri( 'assets/vendor/leaflet/leaflet.css' ) ),
+				'origine'     => COUCOUSIMON_ORIGINE,
+				'origineNom'  => __( 'La Ciotat', 'coucousimon' ),
+			)
 		) . ';',
 		'before'
 	);

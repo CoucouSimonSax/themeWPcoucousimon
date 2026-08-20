@@ -40,8 +40,129 @@
 	var backBtn = root.querySelector( '[data-devis-back]' );
 	var submitBtn = root.querySelector( '[data-devis-submit]' );
 
+	var carteEl = root.querySelector( '[data-devis-carte]' );
+	var carteToile = root.querySelector( '[data-devis-carte-toile]' );
+	var carteVoile = root.querySelector( '[data-devis-carte-voile]' );
+	var carteBouton = root.querySelector( '[data-devis-carte-afficher]' );
+
 	var chercheTimer = null;
 	var enCours = false;
+
+	var carte = null;
+	var trace = null;
+	var pointArrivee = null;
+
+	/** Mémoire du consentement, pour ne pas le redemander à chaque changement de ville. */
+	var CLE_CONSENTEMENT = 'coucousimon-carte';
+
+	/** Le visiteur a-t-il déjà accepté d'afficher la carte pendant cette visite ? */
+	function carteAcceptee() {
+		try {
+			return 'oui' === window.sessionStorage.getItem( CLE_CONSENTEMENT );
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	/** Retient le consentement pour la durée de la visite. */
+	function retientConsentement() {
+		try {
+			window.sessionStorage.setItem( CLE_CONSENTEMENT, 'oui' );
+		} catch ( e ) {}
+	}
+
+	/**
+	 * Charge Leaflet depuis le thème, une seule fois, au moment où on en a besoin.
+	 *
+	 * @return {Promise} Résolue quand L est disponible.
+	 */
+	function chargeLeaflet() {
+		if ( window.L ) {
+			return Promise.resolve();
+		}
+
+		return new Promise( function ( resolve, reject ) {
+			var css = document.createElement( 'link' );
+			css.rel = 'stylesheet';
+			css.href = window.coucousimonDevis.leafletCss;
+			document.head.appendChild( css );
+
+			var js = document.createElement( 'script' );
+			js.src = window.coucousimonDevis.leafletJs;
+			js.onload = resolve;
+			js.onerror = function () {
+				reject( new Error( 'La carte n’a pas pu être chargée.' ) );
+			};
+			document.head.appendChild( js );
+		} );
+	}
+
+	/** Un repère carré, dessiné en CSS : pas d'image à charger. */
+	function repere( modificateur ) {
+		return window.L.divIcon( {
+			className: 'devis__repere devis__repere--' + modificateur,
+			iconSize: [ 14, 14 ],
+			iconAnchor: [ 7, 7 ]
+		} );
+	}
+
+	/** Dessine le trajet. Suppose le consentement déjà donné. */
+	function dessineCarte() {
+		if ( ! trace || ! trace.length ) {
+			return;
+		}
+
+		chargeLeaflet()
+			.then( function () {
+				var L = window.L;
+				var origine = window.coucousimonDevis.origine;
+				var bleu = getComputedStyle( document.documentElement )
+					.getPropertyValue( '--wp--preset--color--blue-500' ).trim() || '#00cccc';
+
+				carteVoile.hidden = true;
+
+				if ( ! carte ) {
+					carte = L.map( carteToile, { scrollWheelZoom: false } );
+					L.tileLayer( 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+						attribution: '© OpenStreetMap',
+						maxZoom: 18
+					} ).addTo( carte );
+					L.marker( origine, { icon: repere( 'depart' ) } )
+						.bindTooltip( window.coucousimonDevis.origineNom )
+						.addTo( carte );
+				}
+
+				if ( carte.__trajet ) {
+					carte.removeLayer( carte.__trajet );
+				}
+
+				if ( carte.__arrivee ) {
+					carte.removeLayer( carte.__arrivee );
+				}
+
+				// L'API rend des couples longitude/latitude ; Leaflet les veut inversés.
+				var points = trace.map( function ( c ) {
+					return [ c[ 1 ], c[ 0 ] ];
+				} );
+
+				carte.__trajet = L.polyline( points, { color: bleu, weight: 4, opacity: 0.9 } ).addTo( carte );
+				carte.__arrivee = L.marker( pointArrivee, { icon: repere( 'arrivee' ) } ).addTo( carte );
+
+				// La carte a été dessinée dans un bloc masqué : il faut la remesurer.
+				carte.invalidateSize();
+				carte.fitBounds( carte.__trajet.getBounds(), { padding: [ 24, 24 ] } );
+			} )
+			.catch( function ( e ) {
+				lieuInfoEl.textContent = e.message;
+			} );
+	}
+
+	/** Range la carte quand il n'y a plus de trajet à montrer. */
+	function cacheCarte() {
+		trace = null;
+		pointArrivee = null;
+		carteEl.hidden = true;
+	}
 
 	/**
 	 * Affiche un écran et masque les autres.
@@ -148,12 +269,23 @@
 			} )
 			.then( function ( trajet ) {
 				state.distance = trajet.km;
-				lieuInfoEl.textContent = trajet.km + ' km depuis La Ciotat · frais de déplacement ' + euros( trajet.km );
+				lieuInfoEl.textContent = trajet.km + ' km depuis ' + window.coucousimonDevis.origineNom +
+					' · frais de déplacement ' + euros( trajet.km );
+
+				trace = trajet.trace;
+				pointArrivee = [ lieu.lat, lieu.lon ];
+				carteEl.hidden = false;
+
+				if ( carteAcceptee() ) {
+					dessineCarte();
+				}
+
 				recalculate();
 			} )
 			.catch( function ( e ) {
 				state.distance = null;
 				lieuInfoEl.textContent = e.message;
+				cacheCarte();
 				recalculate();
 			} );
 	}
@@ -292,6 +424,7 @@
 		state.lon = null;
 		state.distance = null;
 		lieuInfoEl.textContent = '';
+		cacheCarte();
 		recalculate();
 
 		window.clearTimeout( chercheTimer );
@@ -337,6 +470,11 @@
 
 	backBtn.addEventListener( 'click', function () {
 		showStep( '1' );
+	} );
+
+	carteBouton.addEventListener( 'click', function () {
+		retientConsentement();
+		dessineCarte();
 	} );
 
 	submitBtn.addEventListener( 'click', envoie );

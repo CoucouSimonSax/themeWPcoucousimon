@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.3.0
+Version: 0.4.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -160,6 +160,62 @@ Text Domain: coucousimon
 	outline: none;
 	color: var(--wp--custom--color--on-accent);
 	background: var(--wp--preset--color--blue-200);
+}
+
+/* --- Carte du trajet ------------------------------------------------------ */
+
+.devis__carte {
+	position: relative;
+	margin-top: var(--wp--preset--spacing--md);
+	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
+}
+
+.devis__carte[hidden] {
+	display: none;
+}
+
+.devis__carte-toile {
+	height: 17rem;
+	background: var(--wp--custom--color--surface-sunken);
+}
+
+/* Le voile couvre la toile tant que le visiteur n'a pas demandé la carte. */
+.devis__carte-voile {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: var(--wp--preset--spacing--md);
+	padding: var(--wp--preset--spacing--lg);
+	text-align: center;
+	background: var(--wp--custom--color--surface-sunken);
+}
+
+.devis__carte-voile[hidden] {
+	display: none;
+}
+
+.devis__carte-texte {
+	max-width: 42ch;
+	font-size: var(--wp--preset--font-size--sm);
+	color: var(--wp--custom--color--text-muted);
+}
+
+.devis__carte-bouton {
+	width: auto;
+	margin-top: 0;
+}
+
+/* Repères dessinés en CSS : aucune image à charger. */
+.devis__repere {
+	background: var(--wp--preset--color--blue-500);
+	border: var(--wp--custom--border--base) solid var(--wp--preset--color--ink);
+}
+
+.devis__repere--depart {
+	background: var(--wp--preset--color--ink);
 }
 
 /* --- Cartes de formule --------------------------------------------------- */
