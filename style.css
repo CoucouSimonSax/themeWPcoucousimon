@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.7.0
+Version: 0.7.1
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -230,14 +230,17 @@ Text Domain: coucousimon
 }
 
 .devis__repere path {
-	fill: var(--wp--preset--color--blue-500);
 	stroke: var(--wp--preset--color--ink);
 	stroke-width: 2;
 	stroke-linejoin: round;
 }
 
 .devis__repere--depart path {
-	fill: var(--wp--preset--color--ink);
+	fill: var(--wp--preset--color--blue-500);
+}
+
+.devis__repere--arrivee path {
+	fill: var(--wp--preset--color--brass-deep);
 }
 
 /* --- Miniatures de formule ------------------------------------------------
@@ -327,7 +330,7 @@ Text Domain: coucousimon
 	letter-spacing: 0.04em;
 	text-align: center;
 	text-transform: uppercase;
-	color: var(--wp--preset--color--ink);
+	color: var(--wp--preset--color--brass-deep);
 	opacity: 0;
 	transition: opacity var(--wp--custom--motion--base) var(--wp--custom--motion--ease);
 }
@@ -338,7 +341,12 @@ Text Domain: coucousimon
 	opacity: 1;
 }
 
-/* Sur l'aplat bleu coucou, le noir se lit mieux que le blanc. */
+/*
+ * Seule exception à la règle « tout le Gobold en or profond » : sur l'aplat
+ * bleu coucou, l'or ne donne qu'un contraste de 1,8 pour 1 — le nom serait
+ * illisible. Le noir y monte à 15 pour 1. Pour retrouver l'or ici, il
+ * faudrait que la vignette retenue passe en encre plutôt qu'en bleu.
+ */
 .devis-card:has(.devis-card__input:checked) .devis-card__figure,
 .devis-card:has(.devis-card__input:checked) .devis-card__name {
 	color: var(--wp--custom--color--on-accent);
@@ -396,7 +404,7 @@ Text Domain: coucousimon
 	font-size: var(--wp--preset--font-size--xl);
 	line-height: 1;
 	letter-spacing: 0.04em;
-	color: var(--wp--preset--color--ink);
+	color: var(--wp--preset--color--brass-deep);
 }
 
 .devis__detail-desc {
@@ -412,9 +420,6 @@ Text Domain: coucousimon
 	justify-content: space-between;
 	align-items: center;
 	gap: var(--wp--preset--spacing--md);
-	padding: var(--wp--preset--spacing--lg) var(--wp--preset--spacing--xl);
-	background: var(--wp--preset--color--ink);
-	color: var(--wp--custom--color--on-ink);
 }
 
 .devis__total-main {
@@ -427,7 +432,7 @@ Text Domain: coucousimon
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: var(--wp--preset--color--blue-200);
+	color: var(--wp--custom--color--text-muted);
 }
 
 .devis__total-amount {
@@ -436,7 +441,7 @@ Text Domain: coucousimon
 	font-size: var(--wp--preset--font-size--xxl);
 	line-height: 1.08;
 	letter-spacing: 0.04em;
-	color: var(--wp--preset--color--blue-500);
+	color: var(--wp--preset--color--brass-deep);
 }
 
 .devis__total-note {
@@ -445,7 +450,7 @@ Text Domain: coucousimon
 	font-size: var(--wp--preset--font-size--xs);
 	line-height: 1.4;
 	text-align: right;
-	color: var(--wp--preset--color--blue-200);
+	color: var(--wp--custom--color--text-muted);
 }
 
 .devis__total-detail {
@@ -491,6 +496,7 @@ Text Domain: coucousimon
 	cursor: not-allowed;
 }
 
+/* Même exception que la vignette retenue : de l'or sur le bleu ne se lit pas. */
 .devis__btn--primary {
 	background: var(--wp--preset--color--blue-500);
 	color: var(--wp--custom--color--on-accent);
@@ -508,12 +514,12 @@ Text Domain: coucousimon
 .devis__btn--secondary {
 	margin-top: var(--wp--preset--spacing--sm);
 	background: transparent;
-	color: var(--wp--preset--color--ink);
-	border-color: var(--wp--preset--color--ink);
+	color: var(--wp--preset--color--brass-deep);
+	border-color: var(--wp--preset--color--brass-deep);
 }
 
 .devis__btn--secondary:hover {
-	background: var(--wp--preset--color--ink);
+	background: var(--wp--preset--color--brass-deep);
 	color: var(--wp--custom--color--on-ink);
 }
 
