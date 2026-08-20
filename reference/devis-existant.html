@@ -1,0 +1,699 @@
+<!--
+  Page de devis Coucou Simon — capture de l'existant au 20 aout 2026.
+  Source : https://www.tritons.eu/devis-coucou-simon/
+  Le code vit dans le CONTENU de la page (base de donnees), pas dans un theme.
+  Sert de reference pour la reconstruction. Ne pas charger tel quel.
+
+  Dependance externe : Leaflet 1.9.4 (unpkg) + tuiles OpenStreetMap.
+-->
+
+<!-- ===================== MARKUP ===================== -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les tritons &#8211; devis &#8211; Coucou Simon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #1a1a1a; background: #EBEBEB; }
+  .container { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { font-size: 1.6rem; font-weight: 700; color: #00CCCC; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 0.95rem; color: #555; margin-bottom: 2rem; }
+  .section { margin-bottom: 2rem; }
+  label { display: block; font-size: 0.88rem; font-weight: 700; color: #333; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  select, input[type="text"], textarea {
+    width: 100%; padding: 0.65rem 0.85rem; font-size: 1rem;
+    border: 1.5px solid #ccc; border-radius: 4px; background: #ffffff;
+    color: #1a1a1a; font-family: Arial, Helvetica, sans-serif;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: #1a5fa8; }
+  .formule-detail {
+    margin-top: 0.75rem; padding: 0.9rem 1rem;
+    background: #ffffff; border-left: 3px solid #00CCCC;
+    border-radius: 0 4px 4px 0; font-size: 0.92rem; color: #333;
+    display: none;
+  }
+  .formule-detail.visible { display: block; }
+  .formule-detail strong { color: #00CCCC; }
+  #map { width: 100%; height: 240px; border-radius: 4px; border: 1.5px solid #ccc; margin-top: 0.75rem; display: none; }
+  .total-box {
+    background: #1a1a1a; color: #fff;
+    border-radius: 4px; padding: 1.25rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 0.5rem;
+  }
+  .total-box .label { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+  .total-box .montant { font-size: 1.6rem; font-weight: 700; color: #fff; }
+  .total-detail { font-size: 0.85rem; color: #555; margin-top: 0.5rem; }
+  .note-perso { font-size: 0.85rem; color: #888; margin-top: 0.4rem; font-style: italic; }
+  .btn-primary {
+    display: inline-block; width: 100%; padding: 0.85rem;
+    background: #00CCCC; color: #fff; border: none; border-radius: 4px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center;
+    font-family: Arial, Helvetica, sans-serif; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #009999; }
+  .btn-secondary {
+    display: inline-block; width: 100%; padding: 0.75rem;
+    background: #fff; color: #333; border: 1.5px solid #ccc; border-radius: 4px;
+    font-size: 0.95rem; cursor: pointer; text-align: center;
+    font-family: Arial, Helvetica, sans-serif; transition: background 0.15s;
+    margin-top: 0.75rem;
+  }
+  .btn-secondary:hover { background: #f4f4f4; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .recap {
+    background: #ffffff; border-radius: 4px; padding: 1rem 1.25rem;
+    font-size: 0.92rem; color: #333; margin-bottom: 1.5rem;
+  }
+  .recap h3 { font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.04em; color: #888; margin-bottom: 0.75rem; }
+  .recap-line { display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid #e0e0e0; }
+  .recap-line:last-child { border-bottom: none; font-weight: 700; color: #00CCCC; }
+  .success { text-align: center; padding: 3rem 1rem; }
+  .success h2 { color: #00CCCC; margin-bottom: 1rem; }
+  .success p { color: #555; }
+  .distance-info { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
+  input[type="text"]#lieu { }
+  .suggestions {
+    border: 1.5px solid #ccc; border-top: none; border-radius: 0 0 4px 4px;
+    background: #fff; max-height: 200px; overflow-y: auto; display: none;
+  }
+  .suggestion-item {
+    padding: 0.6rem 0.85rem; cursor: pointer; font-size: 0.92rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .suggestion-item:hover { background: #f4f4f4; }
+  .suggestion-item:last-child { border-bottom: none; }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+
+<div class="container">
+
+  <div id="step1" class="step active">
+    <h1>Demande de devis</h1>
+    <p class="subtitle">Coucou Simon · saxophone · La Ciotat</p>
+
+    <div class="section">
+      <label for="formule">Formule</label>
+      <select id="formule" onchange="updateFormule()">
+        <option value="">— Choisir une formule —</option>
+        <option value="sax">sax + amplification (pour accompagner un·e DJ)</option>
+        <option value="djsax">sax + amplification + système son (autonomie)</option>
+        <option value="acoustique">sax acoustique</option>
+      </select>
+      <div id="formule-detail" class="formule-detail"></div>
+    </div>
+
+    <div class="section">
+      <label for="lieu">Lieu de l&rsquo;événement</label>
+      <input type="text" id="lieu" placeholder="Ville ou adresse" autocomplete="off" oninput="onLieuInput()">
+      <div id="suggestions" class="suggestions"></div>
+      <div id="distance-info" class="distance-info"></div>
+      <div id="map"></div>
+    </div>
+
+    <div class="section">
+      <div class="total-box">
+        <div>
+          <div class="label">Estimation</div>
+          <div class="montant" id="total-montant">—</div>
+        </div>
+        <div style="text-align:right; font-size:0.8rem; color:#aaa; max-width:180px; line-height:1.4;">
+          Frais de déplacement inclus
+        </div>
+      </div>
+      <div id="total-detail" class="total-detail"></div>
+      <p class="note-perso" style="margin-top:0.75rem;">Chaque prestation est discutée et adaptée à votre événement. Si vous souhaitez des titres spécifiques, une ambiance particulière, ou même cumuler plusieurs formules, faites-le nous savoir en envoyant la demande !</p>
+    </div>
+
+    <button class="btn-primary" onclick="goToStep2()" id="btn-demande" disabled="" style="opacity:0.45;">Envoyer une demande</button>
+  </div>
+
+  <div id="step2" class="step">
+    <h1>Votre demande</h1>
+    <p class="subtitle" style="margin-bottom:1.5rem;">Récapitulatif et coordonnées</p>
+
+    <div class="recap" id="recap"></div>
+
+    <div class="section">
+      <label for="nom">Nom et prénom</label>
+      <input type="text" id="nom" placeholder="Marie Dupont">
+    </div>
+
+    <div class="section">
+      <label for="email">Email</label>
+      <input type="text" id="email" placeholder="marie@exemple.fr">
+    </div>
+
+    <div class="section">
+      <label for="message">Dites nous en plus !</label>
+      <textarea id="message" rows="5" placeholder="Date, type d'événement, nombre d'invités, ambiance souhaitée, questions..."></textarea>
+    </div>
+
+    <button class="btn-primary" onclick="submitForm()">Envoyer la demande</button>
+    <button class="btn-secondary" onclick="goToStep1()">← Modifier le devis</button>
+  </div>
+
+  <div id="step3" class="step">
+    <div class="success">
+      <h2>Demande envoyée !</h2>
+      <p>Merci ! Simon vous répondra dans les meilleurs délais.<br>En attendant : <strong>+33 6 77 57 40 28</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImIwMWYyYzRiYmFhMjQxNDJhZWNhMDQ5M2UxZDliNzA4IiwiaCI6Im11cm11cjY0In0=';
+const ORIGIN = [43.1768, 5.6043];
+const ORIGIN_LABEL = 'La Ciotat';
+const FORMSPREE_ID = 'xzdklaye';
+
+const FORMULES = {
+  sax: {
+    label: 'sax + ampli',
+    base: 400,
+    detail: `<strong>400 € de base</strong> · Vous avez déjà un·e DJ : je joue par-dessus ses mix. Idéal pour cocktail ou soirée. Jusqu'à 3h d'amplitude, fin avant 23h. Au-delà, on en discute ensemble.`
+  },
+  djsax: {
+    label: 'sax + ampli + sono',
+    base: 450,
+    detail: `<strong>450 € de base</strong> · Je viens avec tout le matériel nécessaire pour le son : sax, sono, ordi, contrôleur. Rien à prévoir de votre côté. Idéal pour cocktail ou soirée clé en main. Jusqu'à 3h d'amplitude, fin avant 23h. Au-delà, on en discute ensemble.`
+  },
+  acoustique: {
+    label: 'acoustique',
+    base: 300,
+    detail: `<strong>300 € de base</strong> · Saxophone acoustique, sans amplification ni DJ. Je joue sur des titres choisis, avec une enceinte portable. Idéal pour une cérémonie religieuse, une demande en mariage, ou un moment intimiste.`
+  }
+};
+
+let state = {
+  formule: null,
+  lieu: null,
+  latlng: null,
+  distance: null,
+  fraisKm: 0,
+  total: null
+};
+
+let map = null;
+let routeLayer = null;
+let destMarker = null;
+let geocodeTimer = null;
+
+function updateFormule() {
+  const val = document.getElementById('formule').value;
+  state.formule = val || null;
+  const detail = document.getElementById('formule-detail');
+  if (val && FORMULES[val]) {
+    detail.innerHTML = FORMULES[val].detail;
+    detail.classList.add('visible');
+  } else {
+    detail.classList.remove('visible');
+  }
+  recalculate();
+}
+
+function onLieuInput() {
+  const q = document.getElementById('lieu').value.trim();
+  clearTimeout(geocodeTimer);
+  if (q.length < 3) {
+    document.getElementById('suggestions').style.display = 'none';
+    return;
+  }
+  geocodeTimer = setTimeout(() => geocode(q), 400);
+}
+
+async function geocode(q) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&countrycodes=fr,mc&accept-language=fr`);
+    const data = await r.json();
+    showSuggestions(data);
+  } catch(e) {}
+}
+
+function showSuggestions(results) {
+  const box = document.getElementById('suggestions');
+  box.innerHTML = '';
+  if (!results.length) { box.style.display = 'none'; return; }
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.textContent = r.display_name;
+    div.onclick = () => selectLieu(r);
+    box.appendChild(div);
+  });
+  box.style.display = 'block';
+}
+
+function selectLieu(r) {
+  document.getElementById('lieu').value = r.display_name.split(',').slice(0,3).join(',');
+  document.getElementById('suggestions').style.display = 'none';
+  state.latlng = [parseFloat(r.lat), parseFloat(r.lon)];
+  state.lieu = document.getElementById('lieu').value;
+  getRoute();
+}
+
+async function getRoute() {
+  if (!state.latlng) return;
+  try {
+    const coords = [[ORIGIN[1], ORIGIN[0]], [state.latlng[1], state.latlng[0]]];
+    const r = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+      method: 'POST',
+      headers: { 'Authorization': ORS_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ coordinates: coords })
+    });
+    const data = await r.json();
+    const dist = data.features[0].properties.summary.distance;
+    state.distance = Math.round(dist / 1000);
+    state.fraisKm = state.distance;
+    showMap(data.features[0].geometry.coordinates, dist);
+    recalculate();
+  } catch(e) {
+    document.getElementById('distance-info').textContent = 'Calcul de distance indisponible.';
+  }
+}
+
+function showMap(coords, distM) {
+  const mapEl = document.getElementById('map');
+  mapEl.style.display = 'block';
+
+  if (!map) {
+    map = L.map('map', { zoomControl: true, scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.marker(ORIGIN).bindTooltip(ORIGIN_LABEL, { permanent: false }).addTo(map);
+  }
+
+  if (routeLayer) map.removeLayer(routeLayer);
+  if (destMarker) map.removeLayer(destMarker);
+
+  const latlngs = coords.map(c => [c[1], c[0]]);
+  routeLayer = L.polyline(latlngs, { color: '#00CCCC', weight: 4, opacity: 0.8 }).addTo(map);
+  destMarker = L.marker(state.latlng).addTo(map);
+  map.fitBounds(routeLayer.getBounds(), { padding: [24, 24] });
+
+  const km = Math.round(distM / 1000);
+  document.getElementById('distance-info').textContent = `Frais de déplacement : ${km} €`;
+}
+
+function recalculate() {
+  if (!state.formule) {
+    document.getElementById('total-montant').textContent = '—';
+    document.getElementById('total-detail').textContent = '';
+    setBtn(false);
+    return;
+  }
+  const base = FORMULES[state.formule].base;
+  const km = state.distance || 0;
+  state.total = base + km;
+  document.getElementById('total-montant').textContent = state.total + ' €';
+  let detail = `${base} € (${FORMULES[state.formule].label})`;
+  if (km) detail += ` + ${km} € (déplacement)`;
+  document.getElementById('total-detail').textContent = detail;
+  setBtn(true);
+}
+
+function setBtn(ok) {
+  const btn = document.getElementById('btn-demande');
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '1' : '0.45';
+}
+
+function goToStep2() {
+  if (!state.formule || !state.total) return;
+  const recap = document.getElementById('recap');
+  const km = state.distance || 0;
+  const base = FORMULES[state.formule].base;
+  recap.innerHTML = `
+    <h3>Récapitulatif</h3>
+    <div class="recap-line"><span>Formule</span><span>${FORMULES[state.formule].label}</span></div>
+    ${state.lieu ? `<div class="recap-line"><span>Lieu</span><span>${state.lieu}</span></div>` : ''}
+    ${km ? `<div class="recap-line"><span>Distance</span><span>${km} km</span></div>` : ''}
+    <div class="recap-line"><span>Base</span><span>${base} €</span></div>
+    ${km ? `<div class="recap-line"><span>Déplacement</span><span>${km} €</span></div>` : ''}
+    <div class="recap-line"><span>Total estimé</span><span>${state.total} €</span></div>
+  `;
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+
+function goToStep1() {
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+}
+
+async function submitForm() {
+  const nom = document.getElementById('nom').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+
+  if (!nom || !email) { alert('Merci de renseigner votre nom et email.'); return; }
+
+  const km = state.distance || 0;
+  const body = `
+DEMANDE DE PRESTATION — COUCOU SIMON
+
+Formule : ${FORMULES[state.formule].label}
+Lieu : ${state.lieu || 'Non précisé'}
+Distance : ${km} km
+Base : ${FORMULES[state.formule].base} €
+Déplacement : ${km} €
+TOTAL ESTIMÉ : ${state.total} €
+
+---
+Nom : ${nom}
+Email : ${email}
+
+Message :
+${message}
+  `.trim();
+
+  try {
+    const r = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, message: body, _subject: `Demande devis sax — ${nom}` })
+    });
+    if (r.ok) {
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step3').classList.add('active');
+    } else {
+      alert('Erreur lors de l\'envoi. Contactez Simon directement : +33 6 77 57 40 28');
+    }
+  } catch(e) {
+    alert('Erreur réseau. Contactez Simon directement : +33 6 77 57 40 28');
+  }
+}
+</script>
+</div>
+
+</main>
+
+
+<footer class="
+
+<!-- ===================== STYLE 1 ===================== -->
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #1a1a1a; background: #EBEBEB; }
+  .container { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { font-size: 1.6rem; font-weight: 700; color: #00CCCC; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 0.95rem; color: #555; margin-bottom: 2rem; }
+  .section { margin-bottom: 2rem; }
+  label { display: block; font-size: 0.88rem; font-weight: 700; color: #333; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  select, input[type="text"], textarea {
+    width: 100%; padding: 0.65rem 0.85rem; font-size: 1rem;
+    border: 1.5px solid #ccc; border-radius: 4px; background: #ffffff;
+    color: #1a1a1a; font-family: Arial, Helvetica, sans-serif;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: #1a5fa8; }
+  .formule-detail {
+    margin-top: 0.75rem; padding: 0.9rem 1rem;
+    background: #ffffff; border-left: 3px solid #00CCCC;
+    border-radius: 0 4px 4px 0; font-size: 0.92rem; color: #333;
+    display: none;
+  }
+  .formule-detail.visible { display: block; }
+  .formule-detail strong { color: #00CCCC; }
+  #map { width: 100%; height: 240px; border-radius: 4px; border: 1.5px solid #ccc; margin-top: 0.75rem; display: none; }
+  .total-box {
+    background: #1a1a1a; color: #fff;
+    border-radius: 4px; padding: 1.25rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 0.5rem;
+  }
+  .total-box .label { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
+  .total-box .montant { font-size: 1.6rem; font-weight: 700; color: #fff; }
+  .total-detail { font-size: 0.85rem; color: #555; margin-top: 0.5rem; }
+  .note-perso { font-size: 0.85rem; color: #888; margin-top: 0.4rem; font-style: italic; }
+  .btn-primary {
+    display: inline-block; width: 100%; padding: 0.85rem;
+    background: #00CCCC; color: #fff; border: none; border-radius: 4px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center;
+    font-family: Arial, Helvetica, sans-serif; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #009999; }
+  .btn-secondary {
+    display: inline-block; width: 100%; padding: 0.75rem;
+    background: #fff; color: #333; border: 1.5px solid #ccc; border-radius: 4px;
+    font-size: 0.95rem; cursor: pointer; text-align: center;
+    font-family: Arial, Helvetica, sans-serif; transition: background 0.15s;
+    margin-top: 0.75rem;
+  }
+  .btn-secondary:hover { background: #f4f4f4; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .recap {
+    background: #ffffff; border-radius: 4px; padding: 1rem 1.25rem;
+    font-size: 0.92rem; color: #333; margin-bottom: 1.5rem;
+  }
+  .recap h3 { font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.04em; color: #888; margin-bottom: 0.75rem; }
+  .recap-line { display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid #e0e0e0; }
+  .recap-line:last-child { border-bottom: none; font-weight: 700; color: #00CCCC; }
+  .success { text-align: center; padding: 3rem 1rem; }
+  .success h2 { color: #00CCCC; margin-bottom: 1rem; }
+  .success p { color: #555; }
+  .distance-info { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
+  input[type="text"]#lieu { }
+  .suggestions {
+    border: 1.5px solid #ccc; border-top: none; border-radius: 0 0 4px 4px;
+    background: #fff; max-height: 200px; overflow-y: auto; display: none;
+  }
+  .suggestion-item {
+    padding: 0.6rem 0.85rem; cursor: pointer; font-size: 0.92rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .suggestion-item:hover { background: #f4f4f4; }
+  .suggestion-item:last-child { border-bottom: none; }
+</style>
+
+<!-- ===================== SCRIPT 1 ===================== -->
+<script>
+const ORS_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImIwMWYyYzRiYmFhMjQxNDJhZWNhMDQ5M2UxZDliNzA4IiwiaCI6Im11cm11cjY0In0=';
+const ORIGIN = [43.1768, 5.6043];
+const ORIGIN_LABEL = 'La Ciotat';
+const FORMSPREE_ID = 'xzdklaye';
+
+const FORMULES = {
+  sax: {
+    label: 'sax + ampli',
+    base: 400,
+    detail: `<strong>400 € de base</strong> · Vous avez déjà un·e DJ : je joue par-dessus ses mix. Idéal pour cocktail ou soirée. Jusqu'à 3h d'amplitude, fin avant 23h. Au-delà, on en discute ensemble.`
+  },
+  djsax: {
+    label: 'sax + ampli + sono',
+    base: 450,
+    detail: `<strong>450 € de base</strong> · Je viens avec tout le matériel nécessaire pour le son : sax, sono, ordi, contrôleur. Rien à prévoir de votre côté. Idéal pour cocktail ou soirée clé en main. Jusqu'à 3h d'amplitude, fin avant 23h. Au-delà, on en discute ensemble.`
+  },
+  acoustique: {
+    label: 'acoustique',
+    base: 300,
+    detail: `<strong>300 € de base</strong> · Saxophone acoustique, sans amplification ni DJ. Je joue sur des titres choisis, avec une enceinte portable. Idéal pour une cérémonie religieuse, une demande en mariage, ou un moment intimiste.`
+  }
+};
+
+let state = {
+  formule: null,
+  lieu: null,
+  latlng: null,
+  distance: null,
+  fraisKm: 0,
+  total: null
+};
+
+let map = null;
+let routeLayer = null;
+let destMarker = null;
+let geocodeTimer = null;
+
+function updateFormule() {
+  const val = document.getElementById('formule').value;
+  state.formule = val || null;
+  const detail = document.getElementById('formule-detail');
+  if (val && FORMULES[val]) {
+    detail.innerHTML = FORMULES[val].detail;
+    detail.classList.add('visible');
+  } else {
+    detail.classList.remove('visible');
+  }
+  recalculate();
+}
+
+function onLieuInput() {
+  const q = document.getElementById('lieu').value.trim();
+  clearTimeout(geocodeTimer);
+  if (q.length < 3) {
+    document.getElementById('suggestions').style.display = 'none';
+    return;
+  }
+  geocodeTimer = setTimeout(() => geocode(q), 400);
+}
+
+async function geocode(q) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&countrycodes=fr,mc&accept-language=fr`);
+    const data = await r.json();
+    showSuggestions(data);
+  } catch(e) {}
+}
+
+function showSuggestions(results) {
+  const box = document.getElementById('suggestions');
+  box.innerHTML = '';
+  if (!results.length) { box.style.display = 'none'; return; }
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'suggestion-item';
+    div.textContent = r.display_name;
+    div.onclick = () => selectLieu(r);
+    box.appendChild(div);
+  });
+  box.style.display = 'block';
+}
+
+function selectLieu(r) {
+  document.getElementById('lieu').value = r.display_name.split(',').slice(0,3).join(',');
+  document.getElementById('suggestions').style.display = 'none';
+  state.latlng = [parseFloat(r.lat), parseFloat(r.lon)];
+  state.lieu = document.getElementById('lieu').value;
+  getRoute();
+}
+
+async function getRoute() {
+  if (!state.latlng) return;
+  try {
+    const coords = [[ORIGIN[1], ORIGIN[0]], [state.latlng[1], state.latlng[0]]];
+    const r = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+      method: 'POST',
+      headers: { 'Authorization': ORS_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ coordinates: coords })
+    });
+    const data = await r.json();
+    const dist = data.features[0].properties.summary.distance;
+    state.distance = Math.round(dist / 1000);
+    state.fraisKm = state.distance;
+    showMap(data.features[0].geometry.coordinates, dist);
+    recalculate();
+  } catch(e) {
+    document.getElementById('distance-info').textContent = 'Calcul de distance indisponible.';
+  }
+}
+
+function showMap(coords, distM) {
+  const mapEl = document.getElementById('map');
+  mapEl.style.display = 'block';
+
+  if (!map) {
+    map = L.map('map', { zoomControl: true, scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.marker(ORIGIN).bindTooltip(ORIGIN_LABEL, { permanent: false }).addTo(map);
+  }
+
+  if (routeLayer) map.removeLayer(routeLayer);
+  if (destMarker) map.removeLayer(destMarker);
+
+  const latlngs = coords.map(c => [c[1], c[0]]);
+  routeLayer = L.polyline(latlngs, { color: '#00CCCC', weight: 4, opacity: 0.8 }).addTo(map);
+  destMarker = L.marker(state.latlng).addTo(map);
+  map.fitBounds(routeLayer.getBounds(), { padding: [24, 24] });
+
+  const km = Math.round(distM / 1000);
+  document.getElementById('distance-info').textContent = `Frais de déplacement : ${km} €`;
+}
+
+function recalculate() {
+  if (!state.formule) {
+    document.getElementById('total-montant').textContent = '—';
+    document.getElementById('total-detail').textContent = '';
+    setBtn(false);
+    return;
+  }
+  const base = FORMULES[state.formule].base;
+  const km = state.distance || 0;
+  state.total = base + km;
+  document.getElementById('total-montant').textContent = state.total + ' €';
+  let detail = `${base} € (${FORMULES[state.formule].label})`;
+  if (km) detail += ` + ${km} € (déplacement)`;
+  document.getElementById('total-detail').textContent = detail;
+  setBtn(true);
+}
+
+function setBtn(ok) {
+  const btn = document.getElementById('btn-demande');
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '1' : '0.45';
+}
+
+function goToStep2() {
+  if (!state.formule || !state.total) return;
+  const recap = document.getElementById('recap');
+  const km = state.distance || 0;
+  const base = FORMULES[state.formule].base;
+  recap.innerHTML = `
+    <h3>Récapitulatif</h3>
+    <div class="recap-line"><span>Formule</span><span>${FORMULES[state.formule].label}</span></div>
+    ${state.lieu ? `<div class="recap-line"><span>Lieu</span><span>${state.lieu}</span></div>` : ''}
+    ${km ? `<div class="recap-line"><span>Distance</span><span>${km} km</span></div>` : ''}
+    <div class="recap-line"><span>Base</span><span>${base} €</span></div>
+    ${km ? `<div class="recap-line"><span>Déplacement</span><span>${km} €</span></div>` : ''}
+    <div class="recap-line"><span>Total estimé</span><span>${state.total} €</span></div>
+  `;
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+
+function goToStep1() {
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+}
+
+async function submitForm() {
+  const nom = document.getElementById('nom').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+
+  if (!nom || !email) { alert('Merci de renseigner votre nom et email.'); return; }
+
+  const km = state.distance || 0;
+  const body = `
+DEMANDE DE PRESTATION — COUCOU SIMON
+
+Formule : ${FORMULES[state.formule].label}
+Lieu : ${state.lieu || 'Non précisé'}
+Distance : ${km} km
+Base : ${FORMULES[state.formule].base} €
+Déplacement : ${km} €
+TOTAL ESTIMÉ : ${state.total} €
+
+---
+Nom : ${nom}
+Email : ${email}
+
+Message :
+${message}
+  `.trim();
+
+  try {
+    const r = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, message: body, _subject: `Demande devis sax — ${nom}` })
+    });
+    if (r.ok) {
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step3').classList.add('active');
+    } else {
+      alert('Erreur lors de l\'envoi. Contactez Simon directement : +33 6 77 57 40 28');
+    }
+  } catch(e) {
+    alert('Erreur réseau. Contactez Simon directement : +33 6 77 57 40 28');
+  }
+}
+</script>
