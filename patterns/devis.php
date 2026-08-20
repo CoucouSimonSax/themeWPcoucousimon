@@ -33,12 +33,15 @@ $coucousimon_opacites = array( '1', '.62', '.38' );
 ?>
 <?php
 /*
- * Le motif du design system, en fond de page. Version fixe : le design system
- * fournit aussi une variante animée (assets/motifs/triangles-live.js), à
- * reprendre à la source le jour où on la voudra.
+ * Le motif du design system, en fond de page. Le motif fixe est posé en fond
+ * de l'enveloppe ; le composant animé vient le recouvrir, à l'identique. Si le
+ * script ne charge pas, ou si le visiteur a réduit les animations, c'est le
+ * motif fixe qui reste — jamais un vide.
  */
 ?>
-<div class="devis-fond" aria-hidden="true"></div>
+<div class="devis-fond" aria-hidden="true">
+	<cs-triangles-live variant="light" speed="0.6"></cs-triangles-live>
+</div>
 
 <div class="devis" data-devis>
 

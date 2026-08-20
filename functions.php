@@ -58,6 +58,29 @@ function coucousimon_enqueue_devis_script() {
 		return;
 	}
 
+	/*
+	 * Le motif animé du fond : le maillage, puis le composant qui l'anime.
+	 * Copiés du design system. Le motif fixe reste posé en fond derrière, si
+	 * bien qu'il n'y a jamais de vide, même si ces deux fichiers échouent.
+	 * Le composant se fige de lui-même quand le visiteur a demandé à son
+	 * système de réduire les animations.
+	 */
+	wp_enqueue_script(
+		'coucousimon-triangles-mesh',
+		get_theme_file_uri( 'assets/motifs/triangles-mesh.js' ),
+		array(),
+		wp_get_theme()->get( 'Version' ),
+		array( 'in_footer' => true )
+	);
+
+	wp_enqueue_script(
+		'coucousimon-triangles-live',
+		get_theme_file_uri( 'assets/motifs/triangles-live.js' ),
+		array( 'coucousimon-triangles-mesh' ),
+		wp_get_theme()->get( 'Version' ),
+		array( 'in_footer' => true )
+	);
+
 	wp_enqueue_script(
 		'coucousimon-devis',
 		get_theme_file_uri( 'assets/js/devis.js' ),
