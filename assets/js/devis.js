@@ -78,12 +78,20 @@
 		} );
 	}
 
-	/** Un repère carré, dessiné en CSS : pas d'image à charger. */
+	/**
+	 * Un repère en triangle, dessiné à même la page : pas d'image à charger,
+	 * et il suit la palette du thème. Il est ancré sur sa base, donc il se
+	 * tient debout sur le point qu'il désigne.
+	 *
+	 * @param {string} modificateur « depart » ou « arrivee ».
+	 * @return {Object} Icône Leaflet.
+	 */
 	function repere( modificateur ) {
 		return window.L.divIcon( {
 			className: 'devis__repere devis__repere--' + modificateur,
-			iconSize: [ 14, 14 ],
-			iconAnchor: [ 7, 7 ]
+			html: '<svg viewBox="0 0 18 18" focusable="false"><path d="M9 2 L17 16 L1 16 Z"/></svg>',
+			iconSize: [ 18, 18 ],
+			iconAnchor: [ 9, 16 ]
 		} );
 	}
 

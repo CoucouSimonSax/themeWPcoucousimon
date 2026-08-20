@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.6.0
+Version: 0.6.1
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -212,14 +212,23 @@ Text Domain: coucousimon
 	display: none;
 }
 
-/* Repères dessinés en CSS : aucune image à charger. */
-.devis__repere {
-	background: var(--wp--preset--color--blue-500);
-	border: var(--wp--custom--border--base) solid var(--wp--preset--color--ink);
+/* Repères dessinés à même la page : aucune image à charger. */
+.devis__repere svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
 }
 
-.devis__repere--depart {
-	background: var(--wp--preset--color--ink);
+.devis__repere path {
+	fill: var(--wp--preset--color--blue-500);
+	stroke: var(--wp--preset--color--ink);
+	stroke-width: 2;
+	stroke-linejoin: round;
+}
+
+.devis__repere--depart path {
+	fill: var(--wp--preset--color--ink);
 }
 
 /* --- Miniatures de formule ------------------------------------------------
@@ -238,8 +247,11 @@ Text Domain: coucousimon
 	position: relative;
 	display: grid;
 	place-items: center;
-	aspect-ratio: 1;
-	padding: var(--wp--preset--spacing--lg);
+
+	/* Deux fois plus basse que large : le motif garde sa colonne, la page
+	   perd la moitié de son défilement. */
+	aspect-ratio: 2;
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--lg);
 	background: var(--wp--preset--color--white);
 	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
 	border-radius: var(--wp--custom--radius);
@@ -276,7 +288,7 @@ Text Domain: coucousimon
 .devis-card__figure {
 	display: block;
 	width: 100%;
-	max-width: var(--wp--preset--spacing--mega);
+	max-width: var(--wp--preset--spacing--huge);
 	color: var(--wp--preset--color--ink);
 	transition: transform var(--wp--custom--motion--base) var(--wp--custom--motion--ease);
 }
@@ -287,18 +299,21 @@ Text Domain: coucousimon
 	height: auto;
 }
 
-.devis-card:hover .devis-card__figure {
-	transform: translateY(calc(-1 * var(--wp--preset--spacing--xs)));
+/* Le motif remonte pour laisser le nom s'installer sous lui. */
+.devis-card:hover .devis-card__figure,
+.devis-card:has(.devis-card__input:focus-visible) .devis-card__figure,
+.devis-card:has(.devis-card__input:checked) .devis-card__figure {
+	transform: translateY(calc(-1 * var(--wp--preset--spacing--sm)));
 }
 
 /* Le nom reste dans le document pour les lecteurs d'écran, même invisible. */
 .devis-card__name {
 	position: absolute;
-	right: var(--wp--preset--spacing--sm);
-	bottom: var(--wp--preset--spacing--sm);
-	left: var(--wp--preset--spacing--sm);
+	right: var(--wp--preset--spacing--xs);
+	bottom: var(--wp--preset--spacing--xs);
+	left: var(--wp--preset--spacing--xs);
 	font-family: var(--wp--preset--font-family--gobold);
-	font-size: var(--wp--preset--font-size--sm);
+	font-size: var(--wp--preset--font-size--xxs);
 	line-height: 1.1;
 	letter-spacing: 0.04em;
 	text-align: center;
