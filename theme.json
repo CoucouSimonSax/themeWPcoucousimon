@@ -71,6 +71,11 @@
 					"slug": "black",
 					"name": "Noir",
 					"color": "#000000"
+				},
+				{
+					"slug": "brass-deep",
+					"name": "Or profond",
+					"color": "#b97d14"
 				}
 			]
 		},
@@ -383,7 +388,7 @@
 			},
 			"heading": {
 				"color": {
-					"text": "var:preset|color|ink"
+					"text": "var:preset|color|brass-deep"
 				},
 				"typography": {
 					"fontFamily": "var:preset|font-family|gobold",

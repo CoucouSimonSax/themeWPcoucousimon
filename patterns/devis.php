@@ -31,6 +31,16 @@ $coucousimon_triangles = array(
 $coucousimon_opacites = array( '1', '.62', '.38' );
 
 ?>
+<?php
+/*
+ * Le motif du design system, en fond de page. Le composant se pose des styles
+ * en ligne sur lui-même, d'où l'enveloppe : c'est elle qui est fixée à l'écran.
+ */
+?>
+<div class="devis-fond" aria-hidden="true">
+	<cs-triangles-live variant="light" speed="0.6"></cs-triangles-live>
+</div>
+
 <div class="devis" data-devis>
 
 	<!-- Écran 1 — formule, lieu, estimation -->
@@ -60,14 +70,22 @@ $coucousimon_opacites = array( '1', '.62', '.38' );
 							</svg>
 						</span>
 
-						<span class="devis-card__body">
-							<span class="devis-card__head">
-								<span class="devis-card__name"><?php echo esc_html( $coucousimon_formule['nom'] ); ?></span>
-								<span class="devis-card__price"><?php echo esc_html( number_format_i18n( $coucousimon_formule['base'] ) ); ?>&nbsp;€</span>
-							</span>
-							<span class="devis-card__desc"><?php echo esc_html( $coucousimon_formule['description'] ); ?></span>
-						</span>
+						<?php /* Toujours dans le document pour les lecteurs d'écran ; révélé au survol. */ ?>
+						<span class="devis-card__name"><?php echo esc_html( $coucousimon_formule['nom'] ); ?></span>
 					</label>
+				<?php endforeach; ?>
+			</div>
+
+			<?php /* Le descriptif de la formule retenue. Les trois sont dans la page, un seul est montré. */ ?>
+			<div class="devis__details">
+				<?php foreach ( $coucousimon_formules as $coucousimon_cle => $coucousimon_formule ) : ?>
+					<div class="devis__detail" data-devis-detail="<?php echo esc_attr( $coucousimon_cle ); ?>" hidden>
+						<p class="devis__detail-head">
+							<span class="devis__detail-name"><?php echo esc_html( $coucousimon_formule['nom'] ); ?></span>
+							<span class="devis__detail-price"><?php echo esc_html( number_format_i18n( $coucousimon_formule['base'] ) ); ?>&nbsp;€</span>
+						</p>
+						<p class="devis__detail-desc"><?php echo esc_html( $coucousimon_formule['description'] ); ?></p>
+					</div>
 				<?php endforeach; ?>
 			</div>
 		</fieldset>

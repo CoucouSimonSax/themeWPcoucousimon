@@ -7,7 +7,7 @@ Description: Thème bloc de Coucou Simon — saxophone, La Ciotat.
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Version: 0.4.0
+Version: 0.5.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: coucousimon
@@ -20,6 +20,32 @@ Text Domain: coucousimon
    Le design system impose zéro arrondi et un contour net : les règles
    border-radius s'appuient donc sur --wp--custom--radius, qui vaut 0.
    ========================================================================== */
+
+/* --- Fond animé ------------------------------------------------------------
+   Le motif de triangles du design system, derrière toute la page. Le composant
+   se met « position: relative » en style en ligne : impossible de le fixer
+   depuis ici, d'où l'enveloppe qui porte la position.
+   -------------------------------------------------------------------------- */
+
+.devis-fond {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	pointer-events: none;
+
+	/*
+	 * La mise en page « contenue » de WordPress plafonne la largeur de chaque
+	 * enfant direct à la taille du contenu. Sur un élément fixé, cela reduit
+	 * le fond à la colonne de texte au lieu de la fenêtre entière.
+	 */
+	max-width: none;
+}
+
+.devis-fond cs-triangles-live {
+	width: 100%;
+	height: 100%;
+}
 
 .devis__step {
 	display: none;
@@ -40,7 +66,7 @@ Text Domain: coucousimon
 	line-height: 1.08;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: var(--wp--preset--color--ink);
+	color: var(--wp--preset--color--brass-deep);
 }
 
 .devis__subtitle {
@@ -74,6 +100,8 @@ Text Domain: coucousimon
 
 .devis__input,
 .devis__textarea {
+	/* Sans cela le champ mesure 100 % PLUS ses marges intérieures, et déborde. */
+	box-sizing: border-box;
 	width: 100%;
 	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
 	font-family: var(--wp--preset--font-family--space-mono);
@@ -218,18 +246,23 @@ Text Domain: coucousimon
 	background: var(--wp--preset--color--ink);
 }
 
-/* --- Cartes de formule --------------------------------------------------- */
+/* --- Miniatures de formule ------------------------------------------------
+   Trois vignettes sur une ligne. La vignette ne porte que les triangles : un
+   triangle par élément de matériel. Le nom se révèle au survol, et reste
+   affiché sur celle qui est retenue. Le descriptif, lui, va dessous.
+   -------------------------------------------------------------------------- */
 
 .devis__cards {
 	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 	gap: var(--wp--preset--spacing--md);
 }
 
 .devis-card {
+	position: relative;
 	display: grid;
-	grid-template-columns: var(--wp--preset--spacing--mega) 1fr;
-	gap: var(--wp--preset--spacing--lg);
-	align-items: start;
+	place-items: center;
+	aspect-ratio: 1;
 	padding: var(--wp--preset--spacing--lg);
 	background: var(--wp--preset--color--white);
 	border: var(--wp--custom--border--base) solid var(--wp--custom--color--border);
@@ -240,7 +273,7 @@ Text Domain: coucousimon
 }
 
 .devis-card:hover {
-	border-color: var(--wp--custom--color--border-hover);
+	border-color: var(--wp--preset--color--ink);
 }
 
 .devis-card:has(.devis-card__input:focus-visible) {
@@ -266,7 +299,10 @@ Text Domain: coucousimon
 
 .devis-card__figure {
 	display: block;
+	width: 100%;
+	max-width: var(--wp--preset--spacing--mega);
 	color: var(--wp--preset--color--ink);
+	transition: transform var(--wp--custom--motion--base) var(--wp--custom--motion--ease);
 }
 
 .devis-card__figure svg {
@@ -275,11 +311,69 @@ Text Domain: coucousimon
 	height: auto;
 }
 
-.devis-card__body {
-	display: block;
+.devis-card:hover .devis-card__figure {
+	transform: translateY(calc(-1 * var(--wp--preset--spacing--xs)));
 }
 
-.devis-card__head {
+/* Le nom reste dans le document pour les lecteurs d'écran, même invisible. */
+.devis-card__name {
+	position: absolute;
+	right: var(--wp--preset--spacing--sm);
+	bottom: var(--wp--preset--spacing--sm);
+	left: var(--wp--preset--spacing--sm);
+	font-family: var(--wp--preset--font-family--gobold);
+	font-size: var(--wp--preset--font-size--sm);
+	line-height: 1.1;
+	letter-spacing: 0.04em;
+	text-align: center;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--ink);
+	opacity: 0;
+	transition: opacity var(--wp--custom--motion--base) var(--wp--custom--motion--ease);
+}
+
+.devis-card:hover .devis-card__name,
+.devis-card:has(.devis-card__input:focus-visible) .devis-card__name,
+.devis-card:has(.devis-card__input:checked) .devis-card__name {
+	opacity: 1;
+}
+
+/* Sur l'aplat bleu coucou, le noir se lit mieux que le blanc. */
+.devis-card:has(.devis-card__input:checked) .devis-card__figure,
+.devis-card:has(.devis-card__input:checked) .devis-card__name {
+	color: var(--wp--custom--color--on-accent);
+}
+
+/* Le survol ne veut rien dire au doigt : sur écran tactile, seul le choix parle. */
+@media (hover: none) {
+
+	.devis-card:hover .devis-card__figure {
+		transform: none;
+	}
+
+	.devis-card:hover .devis-card__name {
+		opacity: 0;
+	}
+
+	.devis-card:has(.devis-card__input:checked) .devis-card__name {
+		opacity: 1;
+	}
+}
+
+/* --- Descriptif de la formule retenue ------------------------------------- */
+
+.devis__detail {
+	margin-top: var(--wp--preset--spacing--md);
+	padding: var(--wp--preset--spacing--lg);
+	background: var(--wp--custom--color--surface-sunken);
+	border-left: var(--wp--custom--border--bold) solid var(--wp--preset--color--blue-500);
+}
+
+.devis__detail[hidden] {
+	display: none;
+}
+
+.devis__detail-head {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
@@ -288,35 +382,26 @@ Text Domain: coucousimon
 	margin-bottom: var(--wp--preset--spacing--xs);
 }
 
-.devis-card__name {
+.devis__detail-name {
 	font-family: var(--wp--preset--font-family--gobold);
 	font-size: var(--wp--preset--font-size--lg);
 	line-height: 1.08;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: var(--wp--preset--color--ink);
+	color: var(--wp--preset--color--brass-deep);
 }
 
-.devis-card__price {
+.devis__detail-price {
 	font-family: var(--wp--preset--font-family--gobold);
 	font-size: var(--wp--preset--font-size--xl);
 	line-height: 1;
 	letter-spacing: 0.04em;
-	color: var(--wp--preset--color--blue-700);
+	color: var(--wp--preset--color--ink);
 }
 
-.devis-card__desc {
-	display: block;
+.devis__detail-desc {
 	font-size: var(--wp--preset--font-size--sm);
 	color: var(--wp--custom--color--text-muted);
-}
-
-/* Sur l'aplat bleu coucou, le noir se lit mieux que le blanc. */
-.devis-card:has(.devis-card__input:checked) .devis-card__figure,
-.devis-card:has(.devis-card__input:checked) .devis-card__name,
-.devis-card:has(.devis-card__input:checked) .devis-card__price,
-.devis-card:has(.devis-card__input:checked) .devis-card__desc {
-	color: var(--wp--custom--color--on-accent);
 }
 
 /* --- Estimation ---------------------------------------------------------- */
@@ -477,12 +562,17 @@ Text Domain: coucousimon
 
 @media (max-width: 600px) {
 
-	.devis-card {
-		grid-template-columns: 1fr;
+	/* Les trois vignettes restent sur une ligne : elles retrecissent, pas la ligne. */
+	.devis__cards {
+		gap: var(--wp--preset--spacing--xs);
 	}
 
-	.devis-card__figure {
-		width: var(--wp--preset--spacing--xxl);
+	.devis-card {
+		padding: var(--wp--preset--spacing--sm);
+	}
+
+	.devis-card__name {
+		font-size: var(--wp--preset--font-size--xxs);
 	}
 
 	.devis__total-note {

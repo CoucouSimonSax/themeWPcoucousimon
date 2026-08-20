@@ -25,6 +25,7 @@
 		lat: null,
 		lon: null,
 		distance: null,
+		frais: 0,
 		total: null
 	};
 
@@ -183,6 +184,17 @@
 		return n.toLocaleString( 'fr-FR' ) + ' €';
 	}
 
+	/**
+	 * Les frais de déplacement. Le tarif vient de inc/devis.php, qui refait
+	 * ce calcul à la réception : les deux doivent tomber sur le même montant.
+	 *
+	 * @param {number} km Distance depuis La Ciotat.
+	 * @return {number} Frais en euros.
+	 */
+	function frais( km ) {
+		return Math.round( km * window.coucousimonDevis.tarifKm );
+	}
+
 	/** Recalcule l'estimation et l'état du bouton. */
 	function recalculate() {
 		if ( ! state.formule ) {
@@ -194,14 +206,15 @@
 
 		var km = state.distance || 0;
 
-		state.total = state.base + km;
+		state.frais = frais( km );
+		state.total = state.base + state.frais;
 
 		totalEl.textContent = euros( state.total );
 
 		var detail = euros( state.base ) + ' (' + state.label + ')';
 
 		if ( km ) {
-			detail += ' + ' + euros( km ) + ' (déplacement)';
+			detail += ' + ' + euros( state.frais ) + ' (déplacement, ' + km + ' km)';
 		}
 
 		detailEl.textContent = detail;
@@ -270,7 +283,7 @@
 			.then( function ( trajet ) {
 				state.distance = trajet.km;
 				lieuInfoEl.textContent = trajet.km + ' km depuis ' + window.coucousimonDevis.origineNom +
-					' · frais de déplacement ' + euros( trajet.km );
+					' · frais de déplacement ' + euros( frais( trajet.km ) );
 
 				trace = trajet.trace;
 				pointArrivee = [ lieu.lat, lieu.lon ];
@@ -303,7 +316,7 @@
 
 		if ( km ) {
 			lines.push( [ 'Distance', km + ' km' ] );
-			lines.push( [ 'Déplacement', euros( km ) ] );
+			lines.push( [ 'Déplacement', euros( state.frais ) ] );
 		}
 
 		lines.push( [ 'Total estimé', euros( state.total ) ] );
@@ -411,6 +424,11 @@
 		state.formule = input.value;
 		state.label = input.getAttribute( 'data-label' ) || input.value;
 		state.base = parseInt( input.getAttribute( 'data-base' ), 10 ) || 0;
+
+		// Un seul descriptif visible : celui de la formule retenue.
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-devis-detail]' ), function ( bloc ) {
+			bloc.hidden = bloc.getAttribute( 'data-devis-detail' ) !== input.value;
+		} );
 
 		recalculate();
 	} );

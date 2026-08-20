@@ -20,6 +20,24 @@ const COUCOUSIMON_ORIGINE = array( 43.1768, 5.6043 );
 const COUCOUSIMON_AGENT = 'CoucouSimon-Devis/1.0 (+https://coucousimon.tritons.eu)';
 
 /**
+ * Frais de déplacement par kilomètre parcouru, aller-retour compris.
+ *
+ * 0,60 € du kilomètre, et le trajet se fait deux fois : 1,20 € par kilomètre
+ * de distance affichée.
+ */
+const COUCOUSIMON_TARIF_KM = 1.2;
+
+/**
+ * Les frais de déplacement pour une distance donnée.
+ *
+ * @param int $km Distance à vol de route depuis La Ciotat.
+ * @return int Frais en euros, arrondis.
+ */
+function coucousimon_devis_frais( $km ) {
+	return (int) round( $km * COUCOUSIMON_TARIF_KM );
+}
+
+/**
  * Les formules et leurs tarifs. Source unique : la page les affiche depuis
  * ici, et le total de l'e-mail est recalculé ici. Modifier un prix se fait
  * donc à un seul endroit.
@@ -30,7 +48,15 @@ const COUCOUSIMON_AGENT = 'CoucouSimon-Devis/1.0 (+https://coucousimon.tritons.e
  * @return array<string, array<string, mixed>>
  */
 function coucousimon_devis_formules() {
+	// L'ordre de ce tableau est celui de la page : du plus léger au plus équipé.
 	return array(
+		'acoustique' => array(
+			'nom'         => __( 'Sax acoustique', 'coucousimon' ),
+			'court'       => __( 'acoustique', 'coucousimon' ),
+			'base'        => 300,
+			'materiel'    => 1,
+			'description' => __( 'Saxophone acoustique, sans amplification ni DJ. Je joue sur des titres choisis, avec une enceinte portable. Idéal pour une cérémonie religieuse, une demande en mariage, ou un moment intimiste.', 'coucousimon' ),
+		),
 		'sax'        => array(
 			'nom'         => __( 'Sax + amplification', 'coucousimon' ),
 			'court'       => __( 'sax + ampli', 'coucousimon' ),
@@ -44,13 +70,6 @@ function coucousimon_devis_formules() {
 			'base'        => 450,
 			'materiel'    => 3,
 			'description' => __( 'Je viens avec tout le matériel nécessaire pour le son : sax, sono, ordi, contrôleur. Rien à prévoir de votre côté. Idéal pour cocktail ou soirée clé en main. Jusqu’à 3 h d’amplitude, fin avant 23 h.', 'coucousimon' ),
-		),
-		'acoustique' => array(
-			'nom'         => __( 'Sax acoustique', 'coucousimon' ),
-			'court'       => __( 'acoustique', 'coucousimon' ),
-			'base'        => 300,
-			'materiel'    => 1,
-			'description' => __( 'Saxophone acoustique, sans amplification ni DJ. Je joue sur des titres choisis, avec une enceinte portable. Idéal pour une cérémonie religieuse, une demande en mariage, ou un moment intimiste.', 'coucousimon' ),
 		),
 	);
 }
@@ -370,7 +389,8 @@ function coucousimon_devis_demande( $request ) {
 		}
 	}
 
-	$total = $formule['base'] + $km;
+	$frais = coucousimon_devis_frais( $km );
+	$total = $formule['base'] + $frais;
 
 	$corps = array(
 		__( 'DEMANDE DE PRESTATION — COUCOU SIMON', 'coucousimon' ),
@@ -379,7 +399,7 @@ function coucousimon_devis_demande( $request ) {
 		sprintf( '%s : %s', __( 'Lieu', 'coucousimon' ), '' !== $lieu ? $lieu : __( 'non précisé', 'coucousimon' ) ),
 		sprintf( '%s : %d km', __( 'Distance', 'coucousimon' ), $km ),
 		sprintf( '%s : %d €', __( 'Base', 'coucousimon' ), $formule['base'] ),
-		sprintf( '%s : %d €', __( 'Déplacement', 'coucousimon' ), $km ),
+		sprintf( '%s : %d € (%d km × %s €/km)', __( 'Déplacement', 'coucousimon' ), $frais, $km, number_format_i18n( COUCOUSIMON_TARIF_KM, 2 ) ),
 		sprintf( '%s : %d €', __( 'TOTAL ESTIMÉ', 'coucousimon' ), $total ),
 		'',
 		'---',
